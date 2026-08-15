@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pré-Saison Football — Tracker S1 & S2</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1420">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pré-Saison">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { font-family: 'Inter', sans-serif; }
+  body { background: #0f1420; color: #f1f5f9; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #1a1f2e; }
+  ::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 2px; }
+  .ring-container { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+  .ring-text { position: absolute; text-align: center; }
+  .exercise-card { transition: all 0.25s cubic-bezier(0.4,0,0.2,1); }
+  .exercise-card:hover { transform: translateY(-1px); }
+  .exercise-details { overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease; max-height: 0; opacity: 0; }
+  .exercise-details.open { max-height: 800px; opacity: 1; }
+  .day-tab { transition: all 0.2s ease; border-bottom: 3px solid transparent; }
+  .day-tab.active { border-bottom-color: #22c55e; color: #22c55e; }
+  .day-tab:not(.active):hover { color: #94a3b8; }
+  .week-btn { transition: all 0.2s ease; }
+  .week-btn.active { background: #22c55e; color: #fff; }
+  .week-btn:not(.active) { background: #1e2940; color: #64748b; }
+  .badge-force    { background:#7c3aed22; color:#a78bfa; border:1px solid #7c3aed44; }
+  .badge-explosivite { background:#dc262622; color:#f87171; border:1px solid #dc262644; }
+  .badge-cardio   { background:#0369a122; color:#38bdf8; border:1px solid #0369a144; }
+  .badge-football { background:#22c55e22; color:#4ade80; border:1px solid #22c55e44; }
+  .badge-repos    { background:#64748b22; color:#94a3b8; border:1px solid #64748b44; }
+  .badge-epaules  { background:#d9770722; color:#fb923c; border:1px solid #d9770744; }
+  .check-btn { transition: all 0.2s ease; }
+  .check-btn.checked { background:#22c55e; border-color:#22c55e; }
+  .check-btn svg { opacity:0; transition:opacity 0.15s; }
+  .check-btn.checked svg { opacity:1; }
+  @keyframes pulse-green { 0%,100%{box-shadow:0 0 0 0 #22c55e40;} 50%{box-shadow:0 0 0 12px transparent;} }
+  .timer-running { animation: pulse-green 1.5s infinite; }
+  .exercise-card.done { opacity:0.52; }
+  .exercise-card.done .exercise-title { text-decoration:line-through; color:#64748b; }
+  .chrono-digit { font-size:3rem; font-weight:900; font-variant-numeric:tabular-nums; letter-spacing:-0.05em; font-family:'Courier New',monospace; }
+  .section-header { border-left:3px solid; padding-left:10px; }
+  .progress-bar { background:linear-gradient(90deg,#22c55e,#16a34a); transition:width 0.5s ease; border-radius:9999px; }
+  .day-content { animation:fadeIn 0.3s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+  .tabs-scroll { scrollbar-width:none; -ms-overflow-style:none; }
+  .tabs-scroll::-webkit-scrollbar { display:none; }
+  .s2-diff { background:#22c55e18; color:#4ade80; border:1px solid #22c55e30; font-size:10px; padding:1px 6px; border-radius:6px; white-space:nowrap; }
+  /* Video embed */
+  .video-label { font-size:11px; color:#64748b; margin-top:6px; text-align:center; }
+  .yt-btn { display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px; border-radius:10px; background:#0a0e1a; border:1px solid #1e2940; cursor:pointer; transition:all 0.2s; text-decoration:none; }
+  .yt-btn:hover { background:#12192e; border-color:#22c55e44; }
+  .yt-icon { width:36px; height:36px; background:#ef4444; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .yt-text { text-align:left; }
+  .yt-text-title { font-size:12px; font-weight:600; color:#e2e8f0; }
+  .yt-text-sub { font-size:10px; color:#64748b; margin-top:1px; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- HEADER -->
+<div class="sticky top-0 z-50" style="background:rgba(15,20,32,0.97);backdrop-filter:blur(12px);border-bottom:1px solid #1e2940;">
+  <div class="max-w-4xl mx-auto px-4">
+    <div class="flex items-center justify-between py-3">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-lg" style="background:#22c55e20;border:1px solid #22c55e44;">⚽</div>
+        <div>
+          <div class="text-sm font-bold text-white" style="letter-spacing:-0.02em;">Pré-Saison Football</div>
+          <div class="text-xs" style="color:#64748b;" id="header-subtitle">Semaine 1 · Programme complet</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="flex gap-1 rounded-xl p-1" style="background:#1e2940;">
+          <button onclick="selectWeek(1)" id="week-btn-1" class="week-btn active text-xs font-bold px-3 py-1.5 rounded-lg">S1</button>
+          <button onclick="selectWeek(2)" id="week-btn-2" class="week-btn text-xs font-bold px-3 py-1.5 rounded-lg">S2</button>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="text-right hidden sm:block">
+            <div class="text-xs" style="color:#64748b;">Semaine</div>
+            <div class="text-sm font-semibold text-white" id="global-progress-text">0 / 7</div>
+          </div>
+          <div class="ring-container" style="width:44px;height:44px;">
+            <svg width="44" height="44" viewBox="0 0 44 44" class="-rotate-90">
+              <circle cx="22" cy="22" r="18" fill="none" stroke="#1e2940" stroke-width="4"/>
+              <circle cx="22" cy="22" r="18" fill="none" stroke="#22c55e" stroke-width="4"
+                stroke-dasharray="113" stroke-dashoffset="113" stroke-linecap="round"
+                id="global-ring" style="transition:stroke-dashoffset 0.6s ease;"/>
+            </svg>
+            <div class="ring-text"><span class="text-xs font-bold text-white" id="global-pct">0%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex gap-1 overflow-x-auto tabs-scroll pb-0" id="day-tabs"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="max-w-4xl mx-auto px-4 py-6" id="main-content"></div>
+
+<!-- TIMER MODAL -->
+<div id="timer-modal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(0,0,0,0.82);backdrop-filter:blur(8px);">
+  <div class="rounded-2xl p-8 text-center w-80" style="background:#1a1f2e;border:1px solid #2d3748;">
+    <div class="text-sm mb-2" style="color:#64748b;" id="timer-label">Récupération</div>
+    <div class="chrono-digit text-white mb-6" id="timer-display">01:30</div>
+    <div class="w-full rounded-full h-1.5 mb-6" style="background:#2d3748;">
+      <div id="timer-progress" class="h-1.5 rounded-full" style="width:100%;background:#22c55e;transition:width 1s linear,background 0.3s;border-radius:9999px;"></div>
+    </div>
+    <div class="flex gap-3 justify-center">
+      <button onclick="toggleTimer()" id="timer-toggle-btn" class="px-6 py-3 rounded-xl font-semibold text-sm text-white timer-running" style="background:#22c55e;">⏸ Pause</button>
+      <button onclick="resetTimer()" class="px-6 py-3 rounded-xl font-semibold text-sm" style="background:#2d3748;color:#94a3b8;">↺ Reset</button>
+      <button onclick="closeTimer()" class="px-6 py-3 rounded-xl font-semibold text-sm" style="background:#2d3748;color:#94a3b8;">✕</button>
+    </div>
+    <div class="mt-5 flex gap-2 justify-center flex-wrap">
+      <span class="text-xs mb-1 w-full" style="color:#64748b;">Préréglages</span>
+      <button onclick="setTimer(45,'Effort 45s')" class="text-xs px-3 py-1.5 rounded-lg" style="background:#2d3748;color:#94a3b8;">45s</button>
+      <button onclick="setTimer(60,'Récup 1min')" class="text-xs px-3 py-1.5 rounded-lg" style="background:#2d3748;color:#94a3b8;">1min</button>
+      <button onclick="setTimer(75,'Récup 75s')" class="text-xs px-3 py-1.5 rounded-lg" style="background:#22c55e20;color:#22c55e;border:1px solid #22c55e44;">75s ★</button>
+      <button onclick="setTimer(90,'Récup 90s')" class="text-xs px-3 py-1.5 rounded-lg" style="background:#2d3748;color:#94a3b8;">90s</button>
+      <button onclick="setTimer(120,'Récup 2min')" class="text-xs px-3 py-1.5 rounded-lg" style="background:#2d3748;color:#94a3b8;">2min</button>
+      <button onclick="setTimer(150,'Récup 2min30')" class="text-xs px-3 py-1.5 rounded-lg" style="background:#2d3748;color:#94a3b8;">2m30</button>
+      <button onclick="setTimer(180,'Récup 3min')" class="text-xs px-3 py-1.5 rounded-lg" style="background:#2d3748;color:#94a3b8;">3min</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// VIDEO MAP — ID YouTube vérifié pour chaque exercice
+// ============================================================
+const YT = {
+  // LUNDI — Pecs/Triceps
+  'Bench Press':                  'vcBig73ojpE',  // Technique Tuesday - bench press
+  'Incline Dumbbell Press':       '8RGZJKLcATU',  // Dumbbell incline press tutorial
+  'Cable Fly':                    'e89-JI0NQDU',  // Cable fly proper form
+  'Triceps Pushdown':             'vB5OHsJ3EME',  // Triceps pushdown form
+  'Overhead Extension':           'nRiJVZDpdL0',  // Overhead triceps extension
+  'Dips':                         'yew6EXMVKFY',  // Dips tutorial proper form
+  'Pallof Press':                 '6pPJUMMOkSE',  // Pallof press anti-rotation
+  'Copenhagen Short Lever':       'nhGK-DxiGBE',  // Short lever Copenhagen
+  // MARDI — Dos/Biceps
+  'Pull-up':                      'eGo4IYlbE5g',  // Pull-up proper form
+  'Bent-over Smith Row':          'T3N-TO4reLQ',  // Barbell row tutorial
+  'Inverted Row':                 'Fl0UMfdEzsE',  // Inverted row progressions
+  'Lat Pulldown':                 'Z_3xHwuO8Tk',  // Lat pulldown perfect form
+  'Seated Row':                   'GZbfZ033f74',  // Seated cable row form
+  'Back Extension':               'ph3pddpKzzw',  // Back extension tutorial
+  'Drag Curl':                    '_43AETBPF_Y',  // Drag curl tutorial
+  'Incline Curl':                 'ykJmrZ5v0Oo',  // Incline curl tutorial
+  'Preacher Curl':                'fIWP-FRFNU0',  // Preacher curl form
+  'Dead Bug':                     'bxn9FBrt4-A',  // NASM dead bug tutorial
+  // MERCREDI — Football/Cardio
+  'Football':                     null,
+  'Intervalles':                  null,
+  // JEUDI — Épaules
+  'Seated DB Overhead Press':     'qEwKCR5JCog',  // OHP tutorial
+  'Shrug':                        'g6qbq4Lf1FI',  // Shrug form tutorial
+  'Face Pull':                    '0Po47vvj9g4',  // Cable face pull PureGym
+  'Single Arm Lateral Raise':     'XNifW8GQHM4',  // Single arm lateral raise
+  'Seated Reverse Fly':           'lPt0GqwaqEw',  // Reverse fly tutorial
+  'Side Plank':                   '_rdfjFSFKMY',  // Side plank proper form
+  'Adductor Squeeze':             'EFfXEAnhxE4',  // Adductor squeeze isometric
+  // VENDREDI — Force/Explosivité
+  'Tapis facile':                 null,
+  'Glute Bridge':                 'APyMiRbiqiM',  // Glute bridge tutorial
+  'Mini-band Lateral Walk':       'fHaVTePfHo8',  // Mini band lateral walk
+  'Squats poids du corps':        'aclHkVaku9U',  // Bodyweight squat form
+  'Pogos':                        'IWFGtxUFVV0',  // Pogos plyometric tutorial
+  'CMJ':                          'A6QgLSAuZH8',  // Countermovement jump tutorial
+  'Traîneau':                     'YJbKlXj4WhI',  // Sled push tutorial
+  'Back Squat':                   'bEv6CCg2BC8',  // Jeff Nippard squat technique
+  'Bulgarian Split Squat':        'hiLF_pF3EJM',  // Bulgarian split squat proper
+  'Hip Thrust':                   'LM8XHLYJoYs',  // Bret Contreras hip thrust
+  'Seated Leg Curl':              'ELOCsoDSmrg',  // Seated leg curl tutorial
+  'Calf Press':                   'gwLzBJYoWlI',  // Calf press form
+  'Nordic Hamstring':             'kFSnvwvc5ac',  // Nordic hamstring proper form
+  'Copenhagen':                   'nhGK-DxiGBE',  // Same short lever vid
+  'Ab Wheel':                     'j6lR4u193gE',  // Ab wheel rollout guide
+  // DIMANCHE — Cardio
+  'Jogging':                      null,
+};
+
+function getYTId(name) {
+  for (const key of Object.keys(YT)) {
+    if (name.toLowerCase().includes(key.toLowerCase())) return YT[key];
+  }
+  return null;
+}
+
+// ============================================================
+// DATA — SEMAINE 1
+// ============================================================
+const WEEK1 = [
+  {
+    id:0, label:'Lun', full:'Lundi', theme:'Pecs / Triceps + Prophylaxie',
+    badge:'force', badgeLabel:'Force', emoji:'💪',
+    sections:[
+      { title:'Échauffement (7 min)', color:'#38bdf8', type:'warmup', exercises:[
+        {id:'s1l1', name:'Tapis facile', sets:'1', reps:'3 min', rest:'—', notes:'Allure légère, activation progressive.'},
+        {id:'s1l2', name:'Mini-band Lateral Walk', sets:'2', reps:'10 pas/côté', rest:'30s', notes:'Bande aux genoux, pas latéraux contrôlés.'},
+        {id:'s1l3', name:'Glute Bridge', sets:'2', reps:'10', rest:'30s', notes:'Poussée talons, hold 1s en haut.'},
+        {id:'s1l4', name:'Adductor Squeeze ballon', sets:'2', reps:'20s à 50-60%', rest:'20s', notes:'Ballon entre genoux, contraction isométrique modérée.'},
+      ]},
+      { title:'Pectoraux', color:'#22c55e', exercises:[
+        {id:'s1l5', name:'Bench Press', sets:'4', reps:'8-10', rest:'2min30', notes:'RIR 2 — ne pas aller à l\'échec. Descente 2s, concentrique contrôlé.'},
+        {id:'s1l6', name:'Incline Dumbbell Press', sets:'3', reps:'8-10', rest:'2min', notes:'Angle ~45°, coudes à 70° du corps.'},
+        {id:'s1l7', name:'Cable Fly (une variante)', sets:'3', reps:'10-12', rest:'90s', notes:'Choisir UNE variante : Decline ou Incline. Étirement complet.'},
+      ]},
+      { title:'Triceps', color:'#f59e0b', exercises:[
+        {id:'s1l8', name:'Triceps Pushdown', sets:'3', reps:'10-12', rest:'60s', notes:'Câble ou élastique. Coudes fixes, extension complète.'},
+        {id:'s1l9', name:'Overhead Extension', sets:'2', reps:'10', rest:'60s', notes:'Haltère ou câble. Étirement maximal.'},
+        {id:'s1l10', name:'Dips', sets:'2', reps:'Max sans échec', rest:'90s', notes:'S\'arrêter 2 reps avant l\'échec. Stabilité scapulaire.'},
+      ]},
+      { title:'Core & Prophylaxie', color:'#a78bfa', type:'prophylaxis', exercises:[
+        {id:'s1l11', name:'Pallof Press', sets:'3', reps:'10/côté', rest:'45s', notes:'2s maintien bras tendus. Anti-rotation. Résistance légère.'},
+        {id:'s1l12', name:'Copenhagen Short Lever', sets:'2', reps:'5/côté', rest:'60s', notes:'Genou sur le banc (pas cheville). Très contrôlé — semaine 1.'},
+      ]},
+    ]
+  },
+  {
+    id:1, label:'Mar', full:'Mardi', theme:'Dos / Biceps',
+    badge:'force', badgeLabel:'Force', emoji:'🏋️',
+    sections:[
+      { title:'Dos', color:'#22c55e', exercises:[
+        {id:'s1ma1', name:'Pull-up', sets:'3', reps:'Max (RPE 7-8)', rest:'2min', notes:'Ne pas aller à l\'échec. Amplitude complète, descente 2s.'},
+        {id:'s1ma2', name:'Bent-over Smith Row', sets:'3', reps:'8-10', rest:'90s', notes:'Dos plat, tirage vers nombril. RPE 7-8.'},
+        {id:'s1ma3', name:'Inverted Row', sets:'3', reps:'10', rest:'60s', notes:'Corps gainé, tirage chest-to-bar.'},
+        {id:'s1ma4', name:'Lat Pulldown', sets:'3', reps:'10-12', rest:'90s', notes:'Prise légèrement plus large que les épaules.'},
+        {id:'s1ma5', name:'Seated Row', sets:'3', reps:'10', rest:'60s', notes:'Poitrine droite. 2s de compression en fin de mouvement.'},
+        {id:'s1ma6', name:'Back Extension', sets:'3', reps:'10', rest:'60s', notes:'Contrôle total, pas d\'hyperextension. Hold 1s en haut.'},
+      ]},
+      { title:'Biceps', color:'#f59e0b', exercises:[
+        {id:'s1ma7', name:'Drag Curl', sets:'3', reps:'10', rest:'60s', notes:'Haltères glissent le long du corps. Supination complète.'},
+        {id:'s1ma8', name:'Incline Curl', sets:'3', reps:'10', rest:'60s', notes:'Banc ~60°. Étirement maximal en bas.'},
+        {id:'s1ma9', name:'Preacher Curl', sets:'3', reps:'10', rest:'60s', notes:'Descente contrôlée. Ne pas aller à l\'échec complet.'},
+      ]},
+      { title:'Core', color:'#a78bfa', type:'prophylaxis', exercises:[
+        {id:'s1ma10', name:'Dead Bug', sets:'3', reps:'8/côté', rest:'45s', notes:'Lombaires collées au sol OBLIGATOIRE. Lent et contrôlé. Anti-extension.'},
+      ]},
+    ]
+  },
+  {
+    id:2, label:'Mer', full:'Mercredi', theme:'Football à 6 / Intermittent',
+    badge:'football', badgeLabel:'Football', emoji:'⚽',
+    sections:[
+      { title:'Échauffement obligatoire (12 min)', color:'#38bdf8', type:'warmup', exercises:[
+        {id:'s1me1', name:'Jogging facile', sets:'1', reps:'3 min', rest:'—', notes:'Activation légère.'},
+        {id:'s1me2', name:'Adductor Squeeze', sets:'2', reps:'20s', rest:'15s', notes:'Isométrique modéré. Adducteurs prioritaires.'},
+        {id:'s1me3', name:'Mini-band Lateral Walk', sets:'2', reps:'10/côté', rest:'20s', notes:'Activation fessiers/abducteurs.'},
+        {id:'s1me4', name:'Glute Bridge', sets:'1', reps:'10', rest:'20s', notes:'Chaîne postérieure.'},
+        {id:'s1me5', name:'Calf Raises', sets:'1', reps:'15', rest:'15s', notes:'Lents, amplitude complète.'},
+        {id:'s1me6', name:'Squats poids du corps', sets:'1', reps:'10', rest:'15s', notes:'Profonds et contrôlés.'},
+        {id:'s1me7', name:'Accélérations progressives', sets:'3', reps:'~20m', rest:'30s', notes:'60% → 70% → 80%. PAS de sprint max.'},
+        {id:'s1me8', name:'Changements direction', sets:'3', reps:'3/côté', rest:'30s', notes:'60-70% seulement. Trajectoire connue.'},
+      ]},
+      { title:'Football à 6 — Semaine 1', color:'#22c55e', exercises:[
+        {id:'s1me9', name:'Match Football à 6', sets:'1', reps:'45-60 min', rest:'—', notes:'RPE ≈7/10. Éviter : sprint absolu, tacle en extension, grand écart, changement direction désespéré 100%.'},
+      ]},
+      { title:'Si PAS de foot — Intermittent tapis', color:'#0369a1', type:'cardio', exercises:[
+        {id:'s1me10', name:'Échauffement tapis', sets:'1', reps:'5min 5.5 + 5min 8 km/h', rest:'—', notes:'Inclinaison 1%.'},
+        {id:'s1me11', name:'Intervalles intermittents', sets:'8', reps:'45s rapide / 75s récup', rest:'75s à 5.5-6.5 km/h', notes:'Démarrer à ~9.5 km/h, ajuster pour RPE 8.'},
+        {id:'s1me12', name:'Cool-down', sets:'1', reps:'5 min à 5.5 km/h', rest:'—', notes:'Respiration contrôlée.'},
+      ]},
+    ]
+  },
+  {
+    id:3, label:'Jeu', full:'Jeudi', theme:'Épaules / Trapèzes',
+    badge:'epaules', badgeLabel:'Épaules', emoji:'🏔️',
+    sections:[
+      { title:'Épaules & Trapèzes', color:'#fb923c', exercises:[
+        {id:'s1j1', name:'Seated DB Overhead Press', sets:'3', reps:'8-10', rest:'2min', notes:'RPE 7-8. Poignets neutres. Descente sous le menton.'},
+        {id:'s1j2', name:'Shrug', sets:'3', reps:'10', rest:'60s', notes:'Hold 1s en haut, descente complète. Pas d\'élan.'},
+        {id:'s1j3', name:'Face Pull', sets:'3', reps:'12-15', rest:'60s', notes:'Câble à hauteur visage. Rotation externe. Santé épaule.'},
+        {id:'s1j4', name:'Single Arm Lateral Raise', sets:'3', reps:'12-15/côté', rest:'45s', notes:'Appui contre poteau. Amplitude complète.'},
+        {id:'s1j5', name:'Seated Reverse Fly', sets:'3', reps:'12', rest:'60s', notes:'Prise neutre. Scapulas rétractées en fin de mouvement.'},
+      ]},
+      { title:'Core', color:'#a78bfa', type:'prophylaxis', exercises:[
+        {id:'s1j6', name:'Side Plank', sets:'3', reps:'30-45s/côté', rest:'30s', notes:'Corps parfaitement aligné. Stabilité latérale.'},
+      ]},
+      { title:'Récupération adducteurs', color:'#38bdf8', exercises:[
+        {id:'s1j7', name:'Adductor Squeeze', sets:'3', reps:'20s à 60%', rest:'20s', notes:'Post-séance. Contraction modérée.'},
+        {id:'s1j8', name:'Mobilité hanche douce', sets:'1', reps:'5 min', rest:'—', notes:'Cercles hanches, étirements doux.'},
+      ]},
+    ]
+  },
+  {
+    id:4, label:'Ven', full:'Vendredi', theme:'Force & Explosivité',
+    badge:'explosivite', badgeLabel:'Explosivité', emoji:'⚡',
+    sections:[
+      { title:'Échauffement (12 min)', color:'#38bdf8', type:'warmup', exercises:[
+        {id:'s1v1', name:'Tapis facile', sets:'1', reps:'5 min', rest:'—', notes:'Allure légère.'},
+        {id:'s1v2', name:'Glute Bridge', sets:'2', reps:'10', rest:'30s', notes:'Activation fessiers.'},
+        {id:'s1v3', name:'Mini-band Lateral Walk', sets:'2', reps:'10/côté', rest:'30s', notes:'Activation abducteurs.'},
+        {id:'s1v4', name:'Adductor Squeeze', sets:'2', reps:'20s', rest:'20s', notes:'Échauffement adducteurs.'},
+        {id:'s1v5', name:'Squats poids du corps', sets:'2', reps:'6', rest:'20s', notes:'Profonds et contrôlés.'},
+        {id:'s1v6', name:'Pogos', sets:'2', reps:'12', rest:'30s', notes:'Rebonds sur place, chevilles rigides.'},
+      ]},
+      { title:'Bloc 1 — Explosivité', color:'#ef4444', exercises:[
+        {id:'s1v7', name:'Countermovement Jump (CMJ)', sets:'4', reps:'3 sauts', rest:'75-90s', notes:'CHAQUE RÉPÉTITION MAXIMALE. 3 sauts → repos complet.'},
+        {id:'s1v8', name:'Traîneau (Sled Push)', sets:'6', reps:'10-12 m', rest:'75-90s', notes:'Charge modérée — tu dois ACCÉLÉRER.'},
+      ]},
+      { title:'Bloc 2 — Force', color:'#22c55e', exercises:[
+        {id:'s1v9', name:'Back Squat', sets:'4', reps:'5', rest:'2min30-3min', notes:'RPE 7. Concentrique avec intention rapide.'},
+        {id:'s1v10', name:'Bulgarian Split Squat', sets:'3', reps:'6/côté', rest:'2min', notes:'RPE 7. Force unilatérale. Genou arrière ~5cm du sol.'},
+        {id:'s1v11', name:'Hip Thrust (Smith)', sets:'3', reps:'6-8', rest:'90s', notes:'RPE 7-7.5. Poussée explosive. Hold 1s en haut.'},
+        {id:'s1v12', name:'Seated Leg Curl', sets:'3', reps:'8', rest:'75s', notes:'Descente contrôlée 2-3s.'},
+        {id:'s1v13', name:'Calf Press', sets:'3', reps:'10-12', rest:'60s', notes:'Arrêt 1s en haut. Descente COMPLÈTE.'},
+      ]},
+      { title:'Bloc 3 — Prophylaxie', color:'#a78bfa', type:'prophylaxis', exercises:[
+        {id:'s1v14', name:'Nordic Hamstring (assisté)', sets:'2', reps:'4', rest:'90s', notes:'Descente LENTE uniquement. Assisté si nécessaire.'},
+        {id:'s1v15', name:'Copenhagen Short Lever', sets:'2', reps:'6/côté', rest:'60s', notes:'Genou sur banc. Très contrôlé.'},
+        {id:'s1v16', name:'Ab Wheel', sets:'3', reps:'8-10', rest:'60s', notes:'Dos plat. Rentrer les abdos.'},
+      ]},
+    ]
+  },
+  {
+    id:5, label:'Sam', full:'Samedi', theme:'Repos & Récupération',
+    badge:'repos', badgeLabel:'Repos', emoji:'😴',
+    sections:[
+      { title:'Journée OFF', color:'#64748b', exercises:[
+        {id:'s1s1', name:'Repos complet', sets:'—', reps:'Toute la journée', rest:'—', notes:'Journée famille. La récupération fait partie du programme.'},
+        {id:'s1s2', name:'Hydratation', sets:'—', reps:'2-3L d\'eau', rest:'—', notes:'Maintenir l\'hydratation même au repos.'},
+        {id:'s1s3', name:'Sommeil', sets:'—', reps:'8h minimum', rest:'—', notes:'Priorité absolue. La supercompensation a lieu durant le sommeil.'},
+      ]},
+    ]
+  },
+  {
+    id:6, label:'Dim', full:'Dimanche', theme:'Cardio Intermittent',
+    badge:'cardio', badgeLabel:'Cardio', emoji:'🏃',
+    sections:[
+      { title:'Échauffement', color:'#38bdf8', type:'warmup', exercises:[
+        {id:'s1d1', name:'Tapis échauffement', sets:'1', reps:'5min à 5.5 km/h', rest:'—', notes:''},
+        {id:'s1d2', name:'Tapis croisière', sets:'1', reps:'8min à 8 km/h', rest:'—', notes:'Inclinaison 1%.'},
+      ]},
+      { title:'Intervalles aérobies — Semaine 1', color:'#38bdf8', type:'cardio', exercises:[
+        {id:'s1d3', name:'Intervalles', sets:'6', reps:'2min RPE 7-7.5 / 90s récup', rest:'90s à 5.5-6.5 km/h', notes:'Démarrer à ~9-9.5 km/h et ajuster. Inclinaison 1%. Total ≈ 37 min.'},
+      ]},
+      { title:'Cool-down', color:'#64748b', exercises:[
+        {id:'s1d4', name:'Marche cool-down', sets:'1', reps:'5 min à 5.5 km/h', rest:'—', notes:'Descente progressive de FC.'},
+      ]},
+    ]
+  },
+];
+
+// ============================================================
+// DATA — SEMAINE 2
+// ============================================================
+const WEEK2 = [
+  {
+    id:0, label:'Lun', full:'Lundi', theme:'Pecs / Triceps + Prophylaxie',
+    badge:'force', badgeLabel:'Force', emoji:'💪',
+    sections:[
+      { title:'Échauffement (7 min)', color:'#38bdf8', type:'warmup', exercises:[
+        {id:'s2l1', name:'Tapis facile', sets:'1', reps:'3 min', rest:'—', notes:'Identique à S1.'},
+        {id:'s2l2', name:'Mini-band Lateral Walk', sets:'2', reps:'10 pas/côté', rest:'30s', notes:''},
+        {id:'s2l3', name:'Glute Bridge', sets:'2', reps:'10', rest:'30s', notes:''},
+        {id:'s2l4', name:'Adductor Squeeze ballon', sets:'2', reps:'20s à 50-60%', rest:'20s', notes:''},
+      ]},
+      { title:'Pectoraux', color:'#22c55e', exercises:[
+        {id:'s2l5', name:'Bench Press', sets:'4', reps:'8-10', rest:'2min30', notes:'RIR 2. Même volume, charge légèrement augmentée si récup bonne.', diff:'+charge si ok'},
+        {id:'s2l6', name:'Incline Dumbbell Press', sets:'3', reps:'8-10', rest:'2min', notes:''},
+        {id:'s2l7', name:'Cable Fly (une variante)', sets:'3', reps:'10-12', rest:'90s', notes:''},
+      ]},
+      { title:'Triceps', color:'#f59e0b', exercises:[
+        {id:'s2l8', name:'Triceps Pushdown', sets:'3', reps:'10-12', rest:'60s', notes:''},
+        {id:'s2l9', name:'Overhead Extension', sets:'2', reps:'10', rest:'60s', notes:''},
+        {id:'s2l10', name:'Dips', sets:'2', reps:'Max sans échec', rest:'90s', notes:''},
+      ]},
+      { title:'Core & Prophylaxie', color:'#a78bfa', type:'prophylaxis', exercises:[
+        {id:'s2l11', name:'Pallof Press', sets:'3', reps:'10/côté', rest:'45s', notes:'Résistance modérée.'},
+        {id:'s2l12', name:'Copenhagen Short Lever', sets:'3', reps:'6/côté', rest:'60s', notes:'3 séries au lieu de 2. Toujours genou sur banc.', diff:'3×6 ↑ vs 2×5'},
+      ]},
+    ]
+  },
+  {
+    id:1, label:'Mar', full:'Mardi', theme:'Dos / Biceps',
+    badge:'force', badgeLabel:'Force', emoji:'🏋️',
+    sections:[
+      { title:'Dos', color:'#22c55e', exercises:[
+        {id:'s2ma1', name:'Pull-up', sets:'3', reps:'Max (RPE 7-8)', rest:'2min', notes:'Si S1 bien passé, cherche 1-2 reps de plus.'},
+        {id:'s2ma2', name:'Bent-over Smith Row', sets:'3', reps:'8-10', rest:'90s', notes:''},
+        {id:'s2ma3', name:'Inverted Row', sets:'3', reps:'10', rest:'60s', notes:''},
+        {id:'s2ma4', name:'Lat Pulldown', sets:'3', reps:'10-12', rest:'90s', notes:''},
+        {id:'s2ma5', name:'Seated Row', sets:'3', reps:'10', rest:'60s', notes:''},
+        {id:'s2ma6', name:'Back Extension', sets:'3', reps:'10', rest:'60s', notes:''},
+      ]},
+      { title:'Biceps', color:'#f59e0b', exercises:[
+        {id:'s2ma7', name:'Drag Curl', sets:'3', reps:'10', rest:'60s', notes:''},
+        {id:'s2ma8', name:'Incline Curl', sets:'3', reps:'10', rest:'60s', notes:''},
+        {id:'s2ma9', name:'Preacher Curl', sets:'3', reps:'10', rest:'60s', notes:''},
+      ]},
+      { title:'Core', color:'#a78bfa', type:'prophylaxis', exercises:[
+        {id:'s2ma10', name:'Dead Bug', sets:'3', reps:'8/côté', rest:'45s', notes:'Si aisé, ralentir encore le tempo.'},
+      ]},
+    ]
+  },
+  {
+    id:2, label:'Mer', full:'Mercredi', theme:'Football à 6 / Intermittent',
+    badge:'football', badgeLabel:'Football', emoji:'⚽',
+    sections:[
+      { title:'Échauffement obligatoire (12 min)', color:'#38bdf8', type:'warmup', exercises:[
+        {id:'s2me1', name:'Jogging facile', sets:'1', reps:'3 min', rest:'—', notes:''},
+        {id:'s2me2', name:'Adductor Squeeze', sets:'2', reps:'20s', rest:'15s', notes:''},
+        {id:'s2me3', name:'Mini-band Lateral Walk', sets:'2', reps:'10/côté', rest:'20s', notes:''},
+        {id:'s2me4', name:'Glute Bridge', sets:'1', reps:'10', rest:'20s', notes:''},
+        {id:'s2me5', name:'Calf Raises', sets:'1', reps:'15', rest:'15s', notes:''},
+        {id:'s2me6', name:'Squats poids du corps', sets:'1', reps:'10', rest:'15s', notes:''},
+        {id:'s2me7', name:'Accélérations progressives', sets:'3', reps:'~20m', rest:'30s', notes:'60% → 70% → 80%.'},
+        {id:'s2me8', name:'Changements direction', sets:'3', reps:'3/côté', rest:'30s', notes:'60-70% seulement.'},
+      ]},
+      { title:'Football à 6 — Semaine 2', color:'#22c55e', exercises:[
+        {id:'s2me9', name:'Match Football à 6', sets:'1', reps:'Durée naturelle', rest:'—', notes:'Si aucune réaction S1 : RPE 7.5-8/10, jeu plus naturel. Toujours pas de sprint 100% volontaire.', diff:'RPE ↑ 7.5-8'},
+      ]},
+      { title:'Si PAS de foot — Intermittent tapis', color:'#0369a1', type:'cardio', exercises:[
+        {id:'s2me10', name:'Échauffement tapis', sets:'1', reps:'5min 5.5 + 5min 8 km/h', rest:'—', notes:''},
+        {id:'s2me11', name:'Intervalles intermittents', sets:'10', reps:'45s rapide / 75s récup', rest:'75s à 5.5-6.5 km/h', notes:'10 répétitions au lieu de 8.', diff:'10×45s ↑ vs 8×45s'},
+        {id:'s2me12', name:'Cool-down', sets:'1', reps:'5 min à 5.5 km/h', rest:'—', notes:''},
+      ]},
+    ]
+  },
+  {
+    id:3, label:'Jeu', full:'Jeudi', theme:'Épaules / Trapèzes',
+    badge:'epaules', badgeLabel:'Épaules', emoji:'🏔️',
+    sections:[
+      { title:'Épaules & Trapèzes', color:'#fb923c', exercises:[
+        {id:'s2j1', name:'Seated DB Overhead Press', sets:'3', reps:'8-10', rest:'2min', notes:''},
+        {id:'s2j2', name:'Shrug', sets:'3', reps:'10', rest:'60s', notes:''},
+        {id:'s2j3', name:'Face Pull', sets:'3', reps:'12-15', rest:'60s', notes:''},
+        {id:'s2j4', name:'Single Arm Lateral Raise', sets:'3', reps:'12-15/côté', rest:'45s', notes:''},
+        {id:'s2j5', name:'Seated Reverse Fly', sets:'3', reps:'12', rest:'60s', notes:''},
+      ]},
+      { title:'Core', color:'#a78bfa', type:'prophylaxis', exercises:[
+        {id:'s2j6', name:'Side Plank', sets:'3', reps:'30-45s/côté', rest:'30s', notes:'Option : ajouter léger poids sur la hanche si aisé.'},
+      ]},
+      { title:'Récupération adducteurs', color:'#38bdf8', exercises:[
+        {id:'s2j7', name:'Adductor Squeeze', sets:'3', reps:'20s à 60%', rest:'20s', notes:''},
+        {id:'s2j8', name:'Mobilité hanche douce', sets:'1', reps:'5 min', rest:'—', notes:''},
+      ]},
+    ]
+  },
+  {
+    id:4, label:'Ven', full:'Vendredi', theme:'Force & Explosivité',
+    badge:'explosivite', badgeLabel:'Explosivité', emoji:'⚡',
+    sections:[
+      { title:'Échauffement (12 min)', color:'#38bdf8', type:'warmup', exercises:[
+        {id:'s2v1', name:'Tapis facile', sets:'1', reps:'5 min', rest:'—', notes:''},
+        {id:'s2v2', name:'Glute Bridge', sets:'2', reps:'10', rest:'30s', notes:''},
+        {id:'s2v3', name:'Mini-band Lateral Walk', sets:'2', reps:'10/côté', rest:'30s', notes:''},
+        {id:'s2v4', name:'Adductor Squeeze', sets:'2', reps:'20s', rest:'20s', notes:''},
+        {id:'s2v5', name:'Squats poids du corps', sets:'2', reps:'6', rest:'20s', notes:''},
+        {id:'s2v6', name:'Pogos', sets:'2', reps:'12', rest:'30s', notes:''},
+      ]},
+      { title:'Bloc 1 — Explosivité', color:'#ef4444', exercises:[
+        {id:'s2v7', name:'Countermovement Jump (CMJ)', sets:'5', reps:'3 sauts', rest:'75-90s', notes:'5 séries au lieu de 4.', diff:'5×3 ↑ vs 4×3'},
+        {id:'s2v8', name:'Traîneau (Sled Push)', sets:'8', reps:'10 m', rest:'75-90s', notes:'8 passages au lieu de 6.', diff:'8×10m ↑ vs 6×12m'},
+      ]},
+      { title:'Bloc 2 — Force', color:'#22c55e', exercises:[
+        {id:'s2v9', name:'Back Squat', sets:'4', reps:'4', rest:'2min30-3min', notes:'4 répétitions, RPE 7-7.5. Intensité légèrement plus haute.', diff:'4×4 RPE7.5 ↑'},
+        {id:'s2v10', name:'Bulgarian Split Squat', sets:'3', reps:'6/côté', rest:'2min', notes:'Légère progression de charge si possible.'},
+        {id:'s2v11', name:'Hip Thrust (Smith)', sets:'3', reps:'6', rest:'90s', notes:'Charge légèrement augmentée.', diff:'Intensité ↑'},
+        {id:'s2v12', name:'Seated Leg Curl', sets:'3', reps:'8', rest:'75s', notes:'Volume identique.'},
+        {id:'s2v13', name:'Calf Press', sets:'3', reps:'10-12', rest:'60s', notes:''},
+      ]},
+      { title:'Bloc 3 — Prophylaxie', color:'#a78bfa', type:'prophylaxis', exercises:[
+        {id:'s2v14', name:'Nordic Hamstring (assisté)', sets:'3', reps:'4', rest:'90s', notes:'3 séries au lieu de 2.', diff:'3×4 ↑ vs 2×4'},
+        {id:'s2v15', name:'Copenhagen Short Lever', sets:'3', reps:'6/côté', rest:'60s', notes:'3 séries.', diff:'3×6 ↑ vs 2×6'},
+        {id:'s2v16', name:'Ab Wheel', sets:'3', reps:'8-10', rest:'60s', notes:'Volume identique.'},
+      ]},
+    ]
+  },
+  {
+    id:5, label:'Sam', full:'Samedi', theme:'Repos & Récupération',
+    badge:'repos', badgeLabel:'Repos', emoji:'😴',
+    sections:[
+      { title:'Journée OFF', color:'#64748b', exercises:[
+        {id:'s2s1', name:'Repos complet', sets:'—', reps:'Toute la journée', rest:'—', notes:'Récupération entre vendredi explosif et dimanche cardio.'},
+        {id:'s2s2', name:'Hydratation', sets:'—', reps:'2-3L d\'eau', rest:'—', notes:''},
+        {id:'s2s3', name:'Sommeil', sets:'—', reps:'8h minimum', rest:'—', notes:'Supercompensation = sommeil.'},
+      ]},
+    ]
+  },
+  {
+    id:6, label:'Dim', full:'Dimanche', theme:'Cardio Intermittent ↑',
+    badge:'cardio', badgeLabel:'Cardio', emoji:'🏃',
+    sections:[
+      { title:'Échauffement', color:'#38bdf8', type:'warmup', exercises:[
+        {id:'s2d1', name:'Tapis échauffement', sets:'1', reps:'5min à 5.5 km/h', rest:'—', notes:''},
+        {id:'s2d2', name:'Tapis croisière', sets:'1', reps:'8min à 8 km/h', rest:'—', notes:'Inclinaison 1%.'},
+      ]},
+      { title:'Premier vrai stimulus VO₂ — Semaine 2', color:'#38bdf8', type:'cardio', exercises:[
+        {id:'s2d3', name:'Intervalles haute intensité', sets:'5', reps:'3min RPE 8 / 2min récup', rest:'2min marche/jog', notes:'Premier vrai stimulus VO₂. Inclinaison 1%.', diff:'5×3min RPE8 ↑'},
+      ]},
+      { title:'Cool-down', color:'#64748b', exercises:[
+        {id:'s2d4', name:'Marche cool-down', sets:'1', reps:'5 min à 5.5 km/h', rest:'—', notes:'Descente progressive de FC.'},
+      ]},
+    ]
+  },
+];
+
+const WEEKS = [WEEK1, WEEK2];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentWeek = 1;
+let currentDay  = 0;
+let completed   = JSON.parse(localStorage.getItem('presaison_v3_completed') || '{}');
+let openCards   = {};
+let timerInterval = null;
+let timerTotal = 90, timerRemaining = 90, timerRunning = false;
+
+// ============================================================
+// RENDER
+// ============================================================
+function selectWeek(w) {
+  currentWeek = w; currentDay = 0;
+  ['1','2'].forEach(n => {
+    document.getElementById('week-btn-'+n).classList.toggle('active', n==w);
+  });
+  document.getElementById('header-subtitle').textContent = `Semaine ${w} · Programme complet`;
+  renderTabs(); renderDay(); updateGlobalProgress();
+}
+
+function selectDay(id) {
+  currentDay = id;
+  renderTabs(); renderDay(); updateGlobalProgress();
+}
+
+function renderTabs() {
+  const days = WEEKS[currentWeek-1];
+  document.getElementById('day-tabs').innerHTML = days.map(d => `
+    <button onclick="selectDay(${d.id})"
+      class="day-tab flex-shrink-0 px-3 py-3 text-xs font-semibold ${currentDay===d.id?'active':'text-slate-500'}">
+      <div>${d.emoji}</div><div>${d.label}</div>
+    </button>`).join('');
+}
+
+function renderDay() {
+  const day = WEEKS[currentWeek-1][currentDay];
+  const allEx = day.sections.flatMap(s => s.exercises);
+  const total = allEx.length;
+  const done  = allEx.filter(e => completed[e.id]).length;
+  const pct   = total > 0 ? Math.round((done/total)*100) : 0;
+  const circ  = 2 * Math.PI * 22;
+
+  let html = `<div class="day-content">
+    <div class="flex items-start justify-between mb-6">
+      <div>
+        <div class="flex items-center gap-2 mb-1 flex-wrap">
+          <span class="text-2xl">${day.emoji}</span>
+          <h1 class="text-xl font-bold text-white">${day.full}</h1>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full badge-${day.badge}">${day.badgeLabel}</span>
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-lg" style="background:#22c55e20;color:#4ade80;border:1px solid #22c55e30;">S${currentWeek}</span>
+        </div>
+        <p class="text-sm" style="color:#94a3b8;">${day.theme}</p>
+      </div>
+      <div class="ring-container flex-shrink-0" style="width:56px;height:56px;">
+        <svg width="56" height="56" viewBox="0 0 56 56" class="-rotate-90">
+          <circle cx="28" cy="28" r="22" fill="none" stroke="#1e2940" stroke-width="5"/>
+          <circle cx="28" cy="28" r="22" fill="none" stroke="#22c55e" stroke-width="5"
+            stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pct/100)}"
+            stroke-linecap="round" style="transition:stroke-dashoffset 0.6s ease;"/>
+        </svg>
+        <div class="ring-text text-center">
+          <div class="text-xs font-bold text-white leading-none">${pct}%</div>
+          <div style="font-size:9px;color:#64748b;">${done}/${total}</div>
+        </div>
+      </div>
+    </div>
+    <div class="rounded-full h-1.5 mb-6" style="background:#1e2940;">
+      <div class="h-1.5 rounded-full progress-bar" style="width:${pct}%;"></div>
+    </div>
+    <button onclick="openTimer(90,'Récupération — 90s')"
+      class="mb-6 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold"
+      style="background:#1e2940;border:1px solid #2d3748;color:#94a3b8;">
+      <span>⏱</span> Chronomètre récupération
+    </button>`;
+
+  day.sections.forEach(section => {
+    const secDone = section.exercises.filter(e => completed[e.id]).length;
+    html += `
+      <div class="mb-5">
+        <div class="flex items-center justify-between mb-3">
+          <div class="section-header" style="border-left-color:${section.color};">
+            <span class="text-sm font-semibold" style="color:${section.color};">${section.title}</span>
+          </div>
+          <span class="text-xs" style="color:#475569;">${secDone}/${section.exercises.length}</span>
+        </div>
+        <div class="flex flex-col gap-2">`;
+    section.exercises.forEach(ex => {
+      html += renderCard(ex, !!completed[ex.id]);
+    });
+    html += `</div></div>`;
+  });
+  html += `</div>`;
+  document.getElementById('main-content').innerHTML = html;
+}
+
+function renderCard(ex, isDone) {
+  const timerSec = parseRest(ex.rest);
+  const diffBadge = ex.diff ? `<span class="s2-diff ml-1">${ex.diff}</span>` : '';
+  const ytId = getYTId(ex.name);
+  const isOpen = openCards[ex.id];
+
+  const videoBlock = ytId ? `
+    <div class="mt-3">
+      <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener noreferrer"
+         class="yt-btn" onclick="event.stopPropagation();">
+        <div class="yt-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </div>
+        <div class="yt-text">
+          <div class="yt-text-title">Voir le tutoriel — ${ex.name}</div>
+          <div class="yt-text-sub">Ouvre YouTube dans un nouvel onglet</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="margin-left:auto;flex-shrink:0;color:#475569;">
+          <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>` : '';
+
+  return `
+    <div class="exercise-card rounded-xl overflow-hidden ${isDone?'done':''}" id="card-${ex.id}"
+      style="background:#13192a;border:1px solid #1e2940;">
+      <div class="flex items-center gap-3 p-3 cursor-pointer" onclick="toggleCard('${ex.id}')">
+        <button onclick="event.stopPropagation();toggleDone('${ex.id}')"
+          class="check-btn flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center ${isDone?'checked':''}"
+          style="${isDone?'background:#22c55e;border-color:#22c55e;':'border-color:#2d3748;'}">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M2 6l3 3 5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-1 flex-wrap">
+            <span class="exercise-title text-sm font-semibold text-white">${ex.name}</span>
+            ${diffBadge}
+          </div>
+          <div class="text-xs mt-0.5" style="color:#475569;">
+            <span style="color:#94a3b8;">${ex.sets} × ${ex.reps}</span>
+            ${ex.rest!=='—'?`<span class="ml-2" style="color:#475569;">↺ ${ex.rest}</span>`:''}
+          </div>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          ${ytId?`<span class="text-xs px-2 py-1 rounded-lg" style="background:#ef444420;color:#f87171;border:1px solid #ef444440;font-size:10px;">▶ vidéo</span>`:''}
+          ${timerSec>0?`<button onclick="event.stopPropagation();openTimer(${timerSec},'Récup — ${ex.name}')"
+            class="text-xs px-2 py-1 rounded-lg" style="background:#1e2940;color:#64748b;border:1px solid #2d3748;">⏱</button>`:''}
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:#475569;flex-shrink:0;transition:transform 0.2s;${isOpen?'transform:rotate(180deg);':''}">
+            <path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="exercise-details ${isOpen?'open':''}" id="details-${ex.id}">
+        <div class="px-3 pb-3 pt-1 border-t" style="border-color:#1e2940;">
+          ${ex.notes?`<p class="text-xs leading-relaxed mb-2" style="color:#94a3b8;">${ex.notes}</p>`:''}
+          <div class="flex gap-2 mb-2 flex-wrap">
+            <span class="text-xs px-2 py-1 rounded-lg font-mono" style="background:#1e2940;color:#22c55e;">${ex.sets} séries</span>
+            <span class="text-xs px-2 py-1 rounded-lg font-mono" style="background:#1e2940;color:#38bdf8;">${ex.reps}</span>
+            ${ex.rest!=='—'?`<span class="text-xs px-2 py-1 rounded-lg font-mono" style="background:#1e2940;color:#f59e0b;">↺ ${ex.rest}</span>`:''}
+          </div>
+          ${videoBlock}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ============================================================
+// INTERACTIONS
+// ============================================================
+function toggleCard(id) {
+  openCards[id] = !openCards[id];
+  const details = document.getElementById(`details-${id}`);
+  if (details) details.classList.toggle('open', !!openCards[id]);
+  // Rotate chevron
+  const card = document.getElementById(`card-${id}`);
+  if (card) {
+    const svg = card.querySelector('.flex.items-center.gap-2.flex-shrink-0 svg');
+    if (svg) svg.style.transform = openCards[id] ? 'rotate(180deg)' : 'rotate(0deg)';
+  }
+}
+
+
+
+function toggleDone(id) {
+  completed[id] = !completed[id];
+  localStorage.setItem('presaison_v3_completed', JSON.stringify(completed));
+  renderDay(); updateGlobalProgress();
+}
+
+function updateGlobalProgress() {
+  const days = WEEKS[currentWeek-1];
+  const allEx = days.flatMap(d => d.sections.flatMap(s => s.exercises));
+  const total = allEx.length;
+  const done  = allEx.filter(e => completed[e.id]).length;
+  const pct   = total > 0 ? Math.round((done/total)*100) : 0;
+  const daysDone = days.filter(d => d.sections.flatMap(s=>s.exercises).some(e=>completed[e.id])).length;
+  const t=document.getElementById('global-progress-text');
+  const p=document.getElementById('global-pct');
+  const r=document.getElementById('global-ring');
+  if(t) t.textContent=`${daysDone} / 7`;
+  if(p) p.textContent=`${pct}%`;
+  if(r) r.style.strokeDashoffset=113*(1-pct/100);
+}
+
+function parseRest(s) {
+  if(!s||s==='—') return 0;
+  if(s.includes('2min30')||s.includes('2m30')) return 150;
+  if(s.includes('3min')) return 180;
+  if(s.includes('2min')) return 120;
+  if(s.includes('90s'))  return 90;
+  if(s.includes('75s'))  return 75;
+  if(s.includes('60s'))  return 60;
+  if(s.includes('45s'))  return 45;
+  if(s.includes('30s'))  return 30;
+  if(s.includes('20s'))  return 20;
+  if(s.includes('15s'))  return 15;
+  return 0;
+}
+
+// ============================================================
+// TIMER
+// ============================================================
+function openTimer(sec, label) {
+  clearInterval(timerInterval);
+  timerTotal=sec||90; timerRemaining=timerTotal; timerRunning=true;
+  document.getElementById('timer-label').textContent=label||'Récupération';
+  updateTimerDisplay();
+  document.getElementById('timer-modal').style.display='flex';
+  const btn=document.getElementById('timer-toggle-btn');
+  btn.textContent='⏸ Pause'; btn.classList.add('timer-running');
+  startCount();
+}
+function startCount() {
+  clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    if(timerRemaining>0){timerRemaining--;updateTimerDisplay();}
+    else{
+      clearInterval(timerInterval);timerRunning=false;
+      const btn=document.getElementById('timer-toggle-btn');
+      btn.textContent='✓ Terminé';btn.classList.remove('timer-running');
+      playBeep();
+    }
+  },1000);
+}
+function toggleTimer() {
+  const btn=document.getElementById('timer-toggle-btn');
+  if(timerRunning){clearInterval(timerInterval);timerRunning=false;btn.textContent='▶ Reprendre';btn.classList.remove('timer-running');}
+  else{timerRunning=true;btn.textContent='⏸ Pause';btn.classList.add('timer-running');startCount();}
+}
+function resetTimer() {
+  clearInterval(timerInterval);timerRemaining=timerTotal;timerRunning=false;
+  updateTimerDisplay();
+  const btn=document.getElementById('timer-toggle-btn');
+  btn.textContent='▶ Start';btn.classList.remove('timer-running');
+}
+function setTimer(sec,label) {
+  clearInterval(timerInterval);timerTotal=sec;timerRemaining=sec;timerRunning=true;
+  if(label) document.getElementById('timer-label').textContent=label;
+  updateTimerDisplay();
+  const btn=document.getElementById('timer-toggle-btn');
+  btn.textContent='⏸ Pause';btn.classList.add('timer-running');
+  startCount();
+}
+function closeTimer() {
+  clearInterval(timerInterval);timerRunning=false;
+  document.getElementById('timer-modal').style.display='none';
+}
+function updateTimerDisplay() {
+  const m=Math.floor(timerRemaining/60),s=timerRemaining%60;
+  document.getElementById('timer-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  const pct=timerTotal>0?(timerRemaining/timerTotal)*100:0;
+  const color=timerRemaining<=10?'#ef4444':timerRemaining<=20?'#f59e0b':'#22c55e';
+  const bar=document.getElementById('timer-progress');
+  bar.style.width=pct+'%'; bar.style.background=color;
+}
+function playBeep() {
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [0,220,440].forEach(delay=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=880;
+      g.gain.setValueAtTime(0.3,ctx.currentTime+delay/1000);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay/1000+0.15);
+      o.start(ctx.currentTime+delay/1000);o.stop(ctx.currentTime+delay/1000+0.15);
+    });
+  }catch(e){}
+}
+document.getElementById('timer-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeTimer();});
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'&&document.getElementById('timer-modal').style.display==='flex'){e.preventDefault();toggleTimer();}
+  if(e.code==='Escape')closeTimer();
+});
+
+// ============================================================
+// INIT
+// ============================================================
+renderTabs(); renderDay(); updateGlobalProgress();
+
+// PWA — Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('✅ SW enregistré'))
+      .catch(err => console.log('SW erreur:', err));
+  });
+}
+</script>
+</body>
+</html>
