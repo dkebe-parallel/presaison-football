@@ -2,7 +2,7 @@
 // Service Worker — Pré-Saison Football Tracker
 // Version du cache : incrémenter à chaque mise à jour du HTML
 // ============================================================
-const CACHE_NAME = 'presaison-v1';
+const CACHE_NAME = 'presaison-v2';
 
 const ASSETS_TO_CACHE = [
   './presaison-football-tracker.html',
