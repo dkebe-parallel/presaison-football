@@ -120,8 +120,10 @@ body { background:#0f1420; color:#f1f5f9; padding-bottom:80px; }
         </div>
         <div class="flex items-center gap-3">
           <div class="flex gap-1 rounded-xl p-1" style="background:#1e2940;">
-            <button onclick="selectWeek(1)" id="week-btn-1" class="week-btn active text-xs font-bold px-3 py-1.5 rounded-lg">S1</button>
-            <button onclick="selectWeek(2)" id="week-btn-2" class="week-btn text-xs font-bold px-3 py-1.5 rounded-lg">S2</button>
+            <button onclick="selectWeek(1)" id="week-btn-1" class="week-btn active text-xs font-bold px-2.5 py-1.5 rounded-lg">S1</button>
+            <button onclick="selectWeek(2)" id="week-btn-2" class="week-btn text-xs font-bold px-2.5 py-1.5 rounded-lg">S2</button>
+            <button onclick="selectWeek(3)" id="week-btn-3" class="week-btn text-xs font-bold px-2.5 py-1.5 rounded-lg">S3</button>
+            <button onclick="selectWeek(4)" id="week-btn-4" class="week-btn text-xs font-bold px-2.5 py-1.5 rounded-lg">S4</button>
           </div>
           <div class="ring-container" style="width:44px;height:44px;">
             <svg width="44" height="44" viewBox="0 0 44 44" class="-rotate-90">
@@ -294,6 +296,18 @@ const YT = {
   'Nordic Hamstring':          'kFSnvwvc5ac',
   'Copenhagen':                'nhGK-DxiGBE',
   'Ab Wheel':                  'j6lR4u193gE',
+  // ── Nouveaux S3/S4 (vérifiés) ──
+  'Chest-supported Row':       '_b6ch2nIchk',  // ✅ Fit Father chest-supported row
+  'Chest-supported row':       '_b6ch2nIchk',
+  'Quad set':                  'd5A5LWDOPE0',  // ✅ Knee Stability quad set
+  'Quad Set':                  'd5A5LWDOPE0',
+  'Straight Leg Raise':        'zo2pqw794B0',  // ✅ SLR knee rehab
+  'Terminal Knee Extension':   '7xG3MeoLjC0',  // ✅ TKE banded rehab
+  'Heel-dig':                  '5zFwQVgaCLk',  // ✅ Heel dig bridge hamstring
+  'Heel-dig hamstring':        '5zFwQVgaCLk',
+  'Romanian Deadlift':         'Q5vwsJFwhyg',  // ✅ Jeff Nippard RDL
+  'Step-down':                 'd93bbZvxe_w',  // ✅ Runna step-down tutorial
+  'Calf raises bilatéraux':    'gwLzBJYoWlI',  // réutilise Calf Press form
 };
 function getYTId(name) {
   for (const k of Object.keys(YT)) {
@@ -581,7 +595,240 @@ const WEEK2 = [
   },
 ];
 
-const WEEKS=[WEEK1,WEEK2];
+const WEEK3 = [
+  { id:0,label:'Lun',full:'Lundi',theme:'OFF Complet',badge:'repos',badgeLabel:'Repos',emoji:'😴',
+    sections:[
+      { title:'Journée OFF',color:'#64748b',exercises:[
+        {id:'s3l1',name:'Repos complet',sets:'—',reps:'Toute la journée',rest:'—',notes:'OFF complet. Récupération genou prioritaire.'},
+      ]},
+    ]
+  },
+  { id:1,label:'Mar',full:'Mardi',theme:'OFF Complet',badge:'repos',badgeLabel:'Repos',emoji:'😴',
+    sections:[
+      { title:'Journée OFF',color:'#64748b',exercises:[
+        {id:'s3ma1',name:'Repos complet',sets:'—',reps:'Toute la journée',rest:'—',notes:'OFF complet. Marche normale autorisée.'},
+      ]},
+    ]
+  },
+  { id:2,label:'Mer',full:'Mercredi',theme:'Pecs / Triceps + Réactivation Genou',badge:'force',badgeLabel:'Force',emoji:'💪',
+    sections:[
+      { title:'Haut du corps',color:'#22c55e',exercises:[
+        {id:'s3me1',name:'Bench Press',sets:'4',reps:'8',rest:'2min30',notes:'RPE 7, 2 reps en réserve. Pas d\'échec musculaire.'},
+        {id:'s3me2',name:'Incline Dumbbell Press',sets:'3',reps:'8-10',rest:'2min',notes:''},
+        {id:'s3me3',name:'Cable Fly ou Incline Fly',sets:'3',reps:'10-12',rest:'90s',notes:'Choisir UNE variante.'},
+        {id:'s3me4',name:'Triceps Pushdown',sets:'3',reps:'10-12',rest:'60s',notes:''},
+        {id:'s3me5',name:'Overhead Extension',sets:'2',reps:'10',rest:'60s',notes:''},
+        {id:'s3me6',name:'Dips',sets:'2',reps:'RIR 2-3',rest:'90s',notes:'Ne pas aller à l\'échec.'},
+        {id:'s3me7',name:'Pallof Press',sets:'3',reps:'10/côté',rest:'45s',notes:'Anti-rotation.'},
+      ]},
+      { title:'Bloc Genou — 12-15 min (aucune flexion profonde)',color:'#a78bfa',type:'prophylaxis',exercises:[
+        {id:'s3me8',name:'Quad Set (contraction quadriceps jambe tendue)',sets:'3',reps:'10 × 5s',rest:'30s',notes:'Contractions de 5s, jambe tendue.'},
+        {id:'s3me9',name:'Straight Leg Raise',sets:'3',reps:'10',rest:'30s',notes:'Jambe droite, quadriceps contracté.'},
+        {id:'s3me10',name:'Glute Bridge',sets:'3',reps:'12',rest:'30s',notes:''},
+        {id:'s3me11',name:'Calf raises bilatéraux',sets:'3',reps:'12',rest:'30s',notes:'Lentement.'},
+        {id:'s3me12',name:'Adductor Squeeze ballon',sets:'3',reps:'20s à 50-60%',rest:'20s',notes:'Seulement 50-60%.'},
+      ]},
+    ]
+  },
+  { id:3,label:'Jeu',full:'Jeudi',theme:'Dos / Biceps',badge:'force',badgeLabel:'Force',emoji:'🏋️',
+    sections:[
+      { title:'Haut du corps',color:'#22c55e',exercises:[
+        {id:'s3j1',name:'Pull-up',sets:'3',reps:'Max (RPE 7-7.5)',rest:'2min',notes:''},
+        {id:'s3j2',name:'Chest-supported Row',sets:'3',reps:'8-10',rest:'90s',notes:'Poitrine appuyée, dos protégé.'},
+        {id:'s3j3',name:'Inverted Row',sets:'3',reps:'10',rest:'60s',notes:''},
+        {id:'s3j4',name:'Lat Pulldown',sets:'3',reps:'8-10',rest:'90s',notes:''},
+        {id:'s3j5',name:'Seated Row',sets:'3',reps:'10',rest:'60s',notes:''},
+        {id:'s3j6',name:'Drag Curl',sets:'3',reps:'10',rest:'60s',notes:''},
+        {id:'s3j7',name:'Incline Curl',sets:'3',reps:'10',rest:'60s',notes:''},
+        {id:'s3j8',name:'Preacher Curl',sets:'3',reps:'10',rest:'60s',notes:''},
+        {id:'s3j9',name:'Back Extension',sets:'3',reps:'10',rest:'60s',notes:'RPE 7-7.5.'},
+      ]},
+      { title:'Genou',color:'#38bdf8',exercises:[
+        {id:'s3j10',name:'Ice Therapy',sets:'1',reps:'10-15 min',rest:'—',notes:'Glaçage genou.'},
+      ]},
+    ]
+  },
+  { id:4,label:'Ven',full:'Vendredi',theme:'Épaules / Trapèzes + Rehab 2',badge:'epaules',badgeLabel:'Épaules',emoji:'🏔️',
+    sections:[
+      { title:'Épaules',color:'#fb923c',exercises:[
+        {id:'s3v1',name:'Seated DB Overhead Press',sets:'3',reps:'8-10',rest:'2min',notes:''},
+        {id:'s3v2',name:'Shrug',sets:'3',reps:'10',rest:'60s',notes:''},
+        {id:'s3v3',name:'Face Pull',sets:'3',reps:'12-15',rest:'60s',notes:''},
+        {id:'s3v4',name:'Single Arm Lateral Raise',sets:'3',reps:'12-15/côté',rest:'45s',notes:''},
+        {id:'s3v5',name:'Reverse Fly',sets:'3',reps:'12',rest:'60s',notes:''},
+        {id:'s3v6',name:'Side Plank',sets:'3',reps:'30-45s/côté',rest:'30s',notes:''},
+      ]},
+      { title:'Genou',color:'#38bdf8',exercises:[
+        {id:'s3v7',name:'Vélo stationnaire',sets:'1',reps:'8-10 min',rest:'—',notes:'Résistance très faible.'},
+      ]},
+      { title:'Rehab',color:'#a78bfa',type:'prophylaxis',exercises:[
+        {id:'s3v8',name:'Terminal Knee Extension élastique',sets:'3',reps:'12-15',rest:'45s',notes:'Verrouiller le genou en fin d\'extension.'},
+        {id:'s3v9',name:'Straight Leg Raise',sets:'2',reps:'12',rest:'30s',notes:''},
+        {id:'s3v10',name:'Heel-dig hamstring isométrique',sets:'3',reps:'20s',rest:'30s',notes:'Talons plantés, ischio activés.'},
+        {id:'s3v11',name:'Glute Bridge',sets:'3',reps:'10',rest:'30s',notes:''},
+        {id:'s3v12',name:'Calf Raise',sets:'3',reps:'12',rest:'30s',notes:''},
+      ]},
+    ]
+  },
+  { id:5,label:'Sam',full:'Samedi',theme:'OFF Complet',badge:'repos',badgeLabel:'Repos',emoji:'😴',
+    sections:[
+      { title:'Journée OFF',color:'#64748b',exercises:[
+        {id:'s3s1',name:'Repos complet',sets:'—',reps:'Toute la journée',rest:'—',notes:'Journée famille. Marche normale autorisée.'},
+      ]},
+    ]
+  },
+  { id:6,label:'Dim',full:'Dimanche',theme:'Jour Test',badge:'cardio',badgeLabel:'Test',emoji:'🧪',
+    sections:[
+      { title:'Test Genou',color:'#ef4444',exercises:[
+        {id:'s3d1',name:'Squats poids du corps à ~60°',sets:'1',reps:'10',rest:'—',notes:'Test de tolérance.'},
+        {id:'s3d2',name:'Step-downs droits (marche 10-15cm)',sets:'1',reps:'10',rest:'—',notes:'Contrôle du genou.'},
+        {id:'s3d3',name:'Step-downs gauches',sets:'1',reps:'10',rest:'—',notes:''},
+      ]},
+      { title:'Tapis',color:'#38bdf8',type:'cardio',exercises:[
+        {id:'s3d4',name:'Marche échauffement',sets:'1',reps:'5 min à 5.5 km/h',rest:'—',notes:''},
+        {id:'s3d5',name:'Intervalles marche/jogging',sets:'6',reps:'1min jog 7-8 / 2min marche 5.5-6',rest:'—',notes:'Puis 5 min marche. Total ≈28 min.'},
+      ]},
+      { title:'Activation / Prophylaxie — 8-10 min',color:'#a78bfa',type:'prophylaxis',exercises:[
+        {id:'s3d6',name:'Glute Bridge',sets:'2',reps:'10',rest:'20s',notes:''},
+        {id:'s3d7',name:'Mini-band Lateral Walk',sets:'2',reps:'8 pas/côté',rest:'20s',notes:''},
+        {id:'s3d8',name:'Terminal Knee Extension élastique',sets:'2',reps:'15',rest:'20s',notes:''},
+        {id:'s3d9',name:'Calf Raises',sets:'2',reps:'12',rest:'20s',notes:''},
+        {id:'s3d10',name:'Adductor Squeeze',sets:'2',reps:'20s à 50-60%',rest:'20s',notes:''},
+        {id:'s3d11',name:'Squats poids du corps ~60°',sets:'2',reps:'6',rest:'20s',notes:''},
+      ]},
+      { title:'Bloc course — ~18 min',color:'#0369a1',type:'cardio',exercises:[
+        {id:'s3d12',name:'Course intervalles',sets:'6',reps:'1min30 course RPE 6-6.5 / 1min30 marche',rest:'—',notes:'6 tours.'},
+      ]},
+      { title:'Test vitesse (si zéro symptôme)',color:'#ef4444',exercises:[
+        {id:'s3d13',name:'Accélérations progressives',sets:'3',reps:'20s progressifs',rest:'70-90s marche',notes:'65% → 70% → 75-80% max. UNIQUEMENT si aucun symptôme.'},
+      ]},
+    ]
+  },
+];
+
+const WEEK4 = [
+  { id:0,label:'Lun',full:'Lundi',theme:'Activation / Veille de Match',badge:'football',badgeLabel:'Activation',emoji:'🌙',
+    sections:[
+      { title:'Échauffement',color:'#38bdf8',type:'warmup',exercises:[
+        {id:'s4l1',name:'Vélo ou marche',sets:'1',reps:'5 min',rest:'—',notes:'Échauffement léger.'},
+      ]},
+      { title:'Activation',color:'#a78bfa',type:'prophylaxis',exercises:[
+        {id:'s4l2',name:'Glute Bridge',sets:'2',reps:'10',rest:'30s',notes:''},
+        {id:'s4l3',name:'Mini-band Lateral Walk',sets:'2',reps:'8/côté',rest:'20s',notes:''},
+        {id:'s4l4',name:'Calf Raise',sets:'2',reps:'12',rest:'20s',notes:''},
+        {id:'s4l5',name:'Adductor Squeeze',sets:'2',reps:'20s',rest:'20s',notes:''},
+        {id:'s4l6',name:'Squats poids du corps 45-60°',sets:'2',reps:'6',rest:'20s',notes:''},
+        {id:'s4l7',name:'Dead Bug',sets:'2',reps:'6/côté',rest:'30s',notes:''},
+      ]},
+      { title:'Jogging',color:'#22c55e',exercises:[
+        {id:'s4l8',name:'Jogging progressif',sets:'3',reps:'20-30s',rest:'60s',notes:'Maximum ~70-75%.'},
+      ]},
+    ]
+  },
+  { id:1,label:'Mar',full:'Mardi',theme:'Match Potentiel',badge:'football',badgeLabel:'Match',emoji:'⚽',
+    sections:[
+      { title:'⚠️ Critères GO (le matin)',color:'#ef4444',exercises:[
+        {id:'s4ma1',name:'Vérification genou',sets:'—',reps:'Checklist',rest:'—',notes:'Jouer UNIQUEMENT si : genou non gonflé (ou trace minime), pas de chaleur anormale, escaliers 0-1/10, flexion/extension normales, aucune réaction au test de dimanche, pas de dérobement/catching/blocage.'},
+      ]},
+      { title:'Échauffement — 12-15 min',color:'#38bdf8',type:'warmup',exercises:[
+        {id:'s4ma2',name:'Jogging progressif',sets:'1',reps:'~5 min',rest:'—',notes:''},
+        {id:'s4ma3',name:'Mobilité dynamique de hanche',sets:'1',reps:'~3 min',rest:'—',notes:''},
+        {id:'s4ma4',name:'Mini-band (si disponible)',sets:'1',reps:'10/côté',rest:'—',notes:''},
+        {id:'s4ma5',name:'Adductor Squeeze',sets:'2',reps:'15s',rest:'15s',notes:''},
+        {id:'s4ma6',name:'Montées de genoux légères',sets:'1',reps:'~1 min',rest:'—',notes:''},
+        {id:'s4ma7',name:'Accélérations',sets:'3',reps:'60→70→80-85%',rest:'30s',notes:''},
+        {id:'s4ma8',name:'Changements direction pré-planifiés',sets:'2',reps:'60-70%',rest:'30s',notes:'2-3 répétitions.'},
+      ]},
+      { title:'Temps de jeu',color:'#22c55e',exercises:[
+        {id:'s4ma9',name:'Match',sets:'1',reps:'30-45 min',rest:'—',notes:'Pas 90 min. Écoute ton genou.'},
+      ]},
+      { title:'Après match',color:'#a78bfa',exercises:[
+        {id:'s4ma10',name:'Marche / cool-down',sets:'1',reps:'8-10 min',rest:'—',notes:''},
+        {id:'s4ma11',name:'Hydratation + électrolytes',sets:'—',reps:'—',rest:'—',notes:''},
+        {id:'s4ma12',name:'Glucides + Whey 25-35g si repas retardé',sets:'—',reps:'—',rest:'—',notes:'Puis repas complet.'},
+        {id:'s4ma13',name:'Froid genou (si soulagement)',sets:'1',reps:'10-15 min',rest:'—',notes:'Uniquement si ça te soulage.'},
+      ]},
+    ]
+  },
+  { id:2,label:'Mer',full:'Mercredi',theme:'Pecs / Triceps + Récupération',badge:'force',badgeLabel:'Force',emoji:'💪',
+    sections:[
+      { title:'Haut du corps',color:'#22c55e',exercises:[
+        {id:'s4me1',name:'Bench Press',sets:'4',reps:'8',rest:'2min30',notes:'RPE 7, 2 reps en réserve.'},
+        {id:'s4me2',name:'Incline Dumbbell Press',sets:'3',reps:'8-10',rest:'2min',notes:''},
+        {id:'s4me3',name:'Cable Fly ou Incline Fly',sets:'3',reps:'10-12',rest:'90s',notes:''},
+        {id:'s4me4',name:'Triceps Pushdown',sets:'3',reps:'10-12',rest:'60s',notes:''},
+        {id:'s4me5',name:'Overhead Extension',sets:'2',reps:'10',rest:'60s',notes:''},
+        {id:'s4me6',name:'Dips',sets:'2',reps:'RIR 2-3',rest:'90s',notes:''},
+        {id:'s4me7',name:'Pallof Press',sets:'3',reps:'10/côté',rest:'45s',notes:''},
+      ]},
+    ]
+  },
+  { id:3,label:'Jeu',full:'Jeudi',theme:'Dos / Biceps + Réintégration',badge:'force',badgeLabel:'Force',emoji:'🏋️',
+    sections:[
+      { title:'Haut du corps',color:'#22c55e',exercises:[
+        {id:'s4j1',name:'Pull-up',sets:'3',reps:'Max (RPE 7-7.5)',rest:'2min',notes:''},
+        {id:'s4j2',name:'Chest-supported Row',sets:'3',reps:'8-10',rest:'90s',notes:''},
+        {id:'s4j3',name:'Inverted Row',sets:'3',reps:'10',rest:'60s',notes:''},
+        {id:'s4j4',name:'Lat Pulldown',sets:'3',reps:'8-10',rest:'90s',notes:''},
+        {id:'s4j5',name:'Seated Row',sets:'3',reps:'10',rest:'60s',notes:''},
+        {id:'s4j6',name:'Drag Curl',sets:'3',reps:'10',rest:'60s',notes:''},
+        {id:'s4j7',name:'Incline Curl',sets:'3',reps:'10',rest:'60s',notes:''},
+        {id:'s4j8',name:'Preacher Curl',sets:'3',reps:'10',rest:'60s',notes:''},
+        {id:'s4j9',name:'Back Extension',sets:'3',reps:'10',rest:'60s',notes:'RPE 7-7.5.'},
+      ]},
+      { title:'Activation / Prophylaxie',color:'#a78bfa',type:'prophylaxis',exercises:[
+        {id:'s4j10',name:'Terminal Knee Extension',sets:'3',reps:'15',rest:'30s',notes:''},
+        {id:'s4j11',name:'Glute Bridge',sets:'3',reps:'10',rest:'30s',notes:''},
+        {id:'s4j12',name:'Heel-dig hamstring',sets:'3',reps:'20s',rest:'30s',notes:''},
+        {id:'s4j13',name:'Calf Raise',sets:'3',reps:'12',rest:'30s',notes:''},
+        {id:'s4j14',name:'Adductor Squeeze',sets:'3',reps:'20s',rest:'20s',notes:''},
+        {id:'s4j15',name:'Copenhagen Short Lever',sets:'2',reps:'5/côté',rest:'60s',notes:'Genou sur banc.'},
+      ]},
+    ]
+  },
+  { id:4,label:'Ven',full:'Vendredi',theme:'Épaules / Traps + Retour Jambes',badge:'explosivite',badgeLabel:'Retour Jambes',emoji:'⚡',
+    sections:[
+      { title:'Épaules',color:'#fb923c',exercises:[
+        {id:'s4v1',name:'Seated DB Overhead Press',sets:'3',reps:'8-10',rest:'2min',notes:''},
+        {id:'s4v2',name:'Shrug',sets:'3',reps:'10',rest:'60s',notes:''},
+        {id:'s4v3',name:'Face Pull',sets:'3',reps:'12-15',rest:'60s',notes:''},
+        {id:'s4v4',name:'Single Arm Lateral Raise',sets:'3',reps:'12-15/côté',rest:'45s',notes:''},
+        {id:'s4v5',name:'Reverse Fly',sets:'3',reps:'12',rest:'60s',notes:''},
+        {id:'s4v6',name:'Side Plank',sets:'3',reps:'30-45s/côté',rest:'30s',notes:''},
+      ]},
+      { title:'Bloc jambes de réintégration',color:'#22c55e',exercises:[
+        {id:'s4v7',name:'Romanian Deadlift',sets:'3',reps:'6',rest:'2min',notes:'RPE 6-7. Charnière de hanche contrôlée.'},
+        {id:'s4v8',name:'Hip Thrust',sets:'3',reps:'8',rest:'90s',notes:'RPE 6-7.'},
+        {id:'s4v9',name:'Seated Leg Curl',sets:'3',reps:'10',rest:'75s',notes:'RPE 6.'},
+        {id:'s4v10',name:'Calf Raise',sets:'3',reps:'12',rest:'60s',notes:''},
+        {id:'s4v11',name:'Squat poids du corps ou goblet léger',sets:'2',reps:'8 à ~60°',rest:'60s',notes:'Amplitude 60° environ.'},
+      ]},
+    ]
+  },
+  { id:5,label:'Sam',full:'Samedi',theme:'OFF Complet',badge:'repos',badgeLabel:'Repos',emoji:'😴',
+    sections:[
+      { title:'Journée OFF',color:'#64748b',exercises:[
+        {id:'s4s1',name:'Repos complet',sets:'—',reps:'Toute la journée',rest:'—',notes:'Journée famille.'},
+      ]},
+    ]
+  },
+  { id:6,label:'Dim',full:'Dimanche',theme:'Retour du Cardio',badge:'cardio',badgeLabel:'Cardio',emoji:'🏃',
+    sections:[
+      { title:'Échauffement',color:'#38bdf8',type:'warmup',exercises:[
+        {id:'s4d1',name:'Marche',sets:'1',reps:'5 min',rest:'—',notes:''},
+        {id:'s4d2',name:'Jogging facile',sets:'1',reps:'5 min',rest:'—',notes:''},
+      ]},
+      { title:'Intervalles',color:'#38bdf8',type:'cardio',exercises:[
+        {id:'s4d3',name:'Intervalles RPE 7-7.5',sets:'4',reps:'3min RPE 7-7.5 / 2min récup',rest:'2min facile',notes:''},
+      ]},
+      { title:'Cool-down',color:'#64748b',exercises:[
+        {id:'s4d4',name:'Cool-down',sets:'1',reps:'5 min',rest:'—',notes:''},
+      ]},
+    ]
+  },
+];
+
+const WEEKS=[WEEK1,WEEK2,WEEK3,WEEK4];
 
 // ============================================================
 // PRÉ-SAISON STATE & RENDER
@@ -592,7 +839,7 @@ let openCards={};
 
 function selectWeek(w){
   currentWeek=w;currentDay=0;
-  ['1','2'].forEach(n=>{document.getElementById('week-btn-'+n).classList.toggle('active',n==w);});
+  ['1','2','3','4'].forEach(n=>{document.getElementById('week-btn-'+n).classList.toggle('active',n==w);});
   document.getElementById('header-subtitle').textContent=`Semaine ${w} · Programme complet`;
   renderTabs();renderDay();updateGlobalProgress();
 }
@@ -1153,7 +1400,7 @@ document.addEventListener('keydown',e=>{
 // ============================================================
 // VERSION — incrémenter à chaque mise à jour déployée
 // ============================================================
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.3.0';
 document.addEventListener('DOMContentLoaded', () => {
   const el = document.getElementById('app-version');
   if (el) el.textContent = 'v' + APP_VERSION;
