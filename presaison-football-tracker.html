@@ -118,7 +118,7 @@ body { background:#0f1420; color:#f1f5f9; padding-bottom:80px; }
           <div class="w-8 h-8 rounded-lg flex items-center justify-center text-lg" style="background:#22c55e20;border:1px solid #22c55e44;">⚽</div>
           <div>
             <div class="text-sm font-bold text-white" style="letter-spacing:-0.02em;">Pré-Saison Football</div>
-            <div class="text-xs" style="color:#64748b;" id="header-subtitle">Semaine 1 · Programme complet</div>
+            <div class="text-xs" style="color:#64748b;" id="header-subtitle">Semaine 1</div>
           </div>
         </div>
         <div class="flex items-center gap-3">
@@ -126,7 +126,7 @@ body { background:#0f1420; color:#f1f5f9; padding-bottom:80px; }
             <button onclick="toggleWeekDropdown()" id="week-dropdown-btn"
               class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold"
               style="background:#1e2940;border:1px solid #2d3748;color:#22c55e;min-width:80px;">
-              <span id="week-dropdown-label">Semaine 1</span>
+              <span id="week-dropdown-label">S1</span>
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="margin-left:auto;flex-shrink:0;" id="week-chevron">
                 <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
@@ -1115,7 +1115,7 @@ let currentWeek=1,currentDay=0;
 let completed=JSON.parse(localStorage.getItem('presaison_v3_completed')||'{}');
 let openCards={};
 
-const WEEK_LABELS=['Semaine 1','Semaine 2','Semaine 3','Semaine 4','Semaine 5','Semaine 6'];
+const WEEK_LABELS=['S1','S2','S3','S4','S5','S6'];
 
 function buildWeekDropdown(){
   const menu=document.getElementById('week-dropdown-menu');
@@ -1155,7 +1155,7 @@ function selectWeek(w){
   currentWeek=w;currentDay=0;
   const label=document.getElementById('week-dropdown-label');
   if(label)label.textContent=WEEK_LABELS[w-1]||'Semaine '+w;
-  document.getElementById('header-subtitle').textContent='Semaine '+w+' · Programme complet';
+  document.getElementById('header-subtitle').textContent='Semaine '+w;
   closeWeekDropdown();
   renderTabs();renderDay();updateGlobalProgress();
 }
